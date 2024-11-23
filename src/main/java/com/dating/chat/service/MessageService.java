@@ -6,7 +6,6 @@ import com.dating.chat.data.RestrictionsNumberMessagesData;
 import com.dating.chat.mapper.MessageDataMapper;
 import com.dating.chat.model.DialogModel;
 import com.dating.chat.model.MessageModel;
-import com.dating.chat.repository.DialogRepository;
 import com.dating.chat.repository.MessageRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MessageService {
     private MessageRepository messageRepository;
-    private DialogRepository dialogRepository;
+    private DialogService dialogService;
 
     public ResponseData<List<MessageData>> getDialogMessages(String dialogCode, RestrictionsNumberMessagesData data) {
         if (data.isAll()) {
@@ -27,7 +26,7 @@ public class MessageService {
                             .map(MessageDataMapper::map)
                             .toList()
             );
-        } else if (!dialogRepository.existsByPublicCode(dialogCode)) {
+        } else if (!dialogService.existsDialog(dialogCode)) {
             return new ResponseData<>(false, "Dialogue error!", null);
         } else if (data.getAmount() > messageRepository.countAllByDialogPublicCode(dialogCode)) {
             return new ResponseData<>(
@@ -47,11 +46,11 @@ public class MessageService {
     }
 
     public ResponseData<Void> createMessage(MessageData data) {
-        if (!dialogRepository.existsByPublicCode(data.getDialogCode())) {
+        if (!dialogService.existsDialog(data.getDialogCode())) {
             return new ResponseData<>(false, "This dialog does not exist or you do not have access to it!", null);
         }
 
-        DialogModel dialog = dialogRepository.findByPublicCode(data.getDialogCode());
+        DialogModel dialog = dialogService.getDialog(data.getDialogCode());
         MessageModel message = new MessageModel();
         message.setTextData(data.getText());
         message.setSender(data.getSender());

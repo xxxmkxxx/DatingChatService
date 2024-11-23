@@ -34,4 +34,12 @@ public class DialogService {
 
         return new ResponseData<>(true, "Dialogue successfully created!", dialog.getPublicCode());
     }
+
+    public boolean existsDialog(String dialogCode) {
+        return dialogRepository.existsByPublicCode(dialogCode);
+    }
+
+    public DialogModel getDialog(String dialogCode) {
+        return dialogRepository.findByPublicCode(dialogCode).orElse(new DialogModel());
+    }
 }
