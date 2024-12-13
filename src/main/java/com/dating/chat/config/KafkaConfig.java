@@ -14,13 +14,13 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class KafkaConfig {
-    private final String bootstrapServerConfig = "localhost:9092";
-    private final String groupIdConfig = "dating";
+    public static final String BOOTSTRAP_SERVER_CONFIG = "localhost:9092";
+    public static final String GROUP_ID_CONFIG = "dating";
 
     @Bean
     public ProducerFactory<String, String> producerFactory() {
         return new DefaultKafkaProducerFactory<>(Map.of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServerConfig,
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER_CONFIG,
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class
         ));
@@ -34,8 +34,8 @@ public class KafkaConfig {
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(Map.of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServerConfig,
-                org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG, groupIdConfig,
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER_CONFIG,
+                org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID_CONFIG,
                 org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class
         ));
