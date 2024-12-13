@@ -1,56 +1,51 @@
 package com.dating.chat.service;
 
 import com.dating.chat.data.MessageData;
-import com.dating.chat.data.ResponseData;
-import com.dating.chat.data.RestrictionsNumberMessagesData;
 import com.dating.chat.mapper.MessageDataMapper;
+import com.dating.chat.model.DialogModel;
 import com.dating.chat.model.MessageModel;
 import com.dating.chat.repository.MessageRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MessageService {
-    private MessageRepository repository;
+    private final DialogService dialogService;
+    private final MessageRepository messageRepository;
 
-    public ResponseData<List<MessageData>> getMessages(String dialogCode, RestrictionsNumberMessagesData data) {
-        if (data.isAll()) {
-            return new ResponseData<>(
-                    true, null,
-                    repository.getAllByDialogPublicCode(dialogCode).stream()
-                            .map(MessageDataMapper::map)
-                            .toList()
-            );
-        } else if (data.getAmount() > repository.countAllByDialogPublicCode(dialogCode)) {
-            return new ResponseData<>(
-                    true, null,
-                    repository.findLastRecordsWithAmount(repository.countAllByDialogPublicCode(dialogCode), dialogCode).stream()
-                            .map(MessageDataMapper::map)
-                            .toList()
-            );
-        } else {
-            return new ResponseData<>(
-                    true, null,
-                    repository.findLastRecordsWithAmount(data.getAmount(), dialogCode).stream()
-                            .map(MessageDataMapper::map)
-                            .toList()
-            );
-        }
+    public List<MessageData> getMessages(String dialogCode) {
+        return messageRepository.getAllByDialogPublicCode(dialogCode).stream()
+                .map(MessageDataMapper::map)
+                .toList();
     }
 
-    public ResponseData<MessageModel> createMessage(MessageData data) {
-        MessageModel message = new MessageModel();
-        message.setTextData(data.getText());
-        message.setSender(data.getSender());
+    public String createMessage(String dialogCode, MessageData messageData) {
+        DialogModel dialog = dialogService.getDialogModel(dialogCode);
+        MessageModel message = updateMessage(dialogCode, messageData);
 
-        return new ResponseData<>(true, "Message send successfully!", repository.save(message));
+        dialog.addMessage(messageRepository.save(message));
+        dialogService.updateDialog(dialog);
+
+        return "Сообщение успешно создано!";
     }
 
-    public ResponseData<?> updateMessage(MessageModel message) {
-        repository.save(message);
-        return new ResponseData<>(true, "Message successfully changed!", null);
+    private MessageModel updateMessage(String dialogCode, MessageData messageData) {
+        return messageRepository.findByDialogPublicCode(dialogCode)
+                .map(messageModel -> {
+                    messageModel.setTextData(messageData.getText());
+                    messageModel.setSender(messageData.getSender());
+
+                    return messageModel;
+                })
+                .orElseGet(() -> {
+                    MessageModel messageModel = new MessageModel();
+                    messageModel.setTextData(messageData.getText());
+                    messageModel.setSender(messageData.getSender());
+
+                    return messageModel;
+                });
     }
 }

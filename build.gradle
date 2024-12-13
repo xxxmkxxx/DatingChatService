@@ -13,6 +13,10 @@ java {
     }
 }
 
+ext {
+    jjwtVersion = "0.12.6"
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -33,9 +37,11 @@ dependencies {
 
     runtimeOnly 'org.postgresql:postgresql'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: "${jjwtVersion}"
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: "${jjwtVersion}"
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: "${jjwtVersion}"
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 test {

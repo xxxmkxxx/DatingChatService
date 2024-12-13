@@ -2,11 +2,12 @@ services:
   app:
     build: .
     ports:
-      - "8080:8080"
+      - "8082:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dating
       SPRING_DATASOURCE_USERNAME: dev
       SPRING_DATASOURCE_PASSWORD: 1237894560
+      JWT_KEY: x3q9_62IxSgNDGczooBQJ-JYHRV0C839d8P-FEkKloA=
     depends_on:
       - db
 
@@ -17,7 +18,7 @@ services:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: 1237894560
     ports:
-      - "5435:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

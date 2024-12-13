@@ -9,7 +9,6 @@ public class MessageDataMapper {
                 .sender(model.getSender())
                 .text(model.getTextData())
                 .dateTime(model.getCreateTime())
-                .dialogCode(model.getDialog().getPublicCode())
                 .build();
     }
 }

@@ -1,26 +1,32 @@
 package com.dating.chat.service;
 
+import com.dating.chat.common.exception.CreateDialogConflictException;
+import com.dating.chat.common.exception.DialogNotFoundException;
 import com.dating.chat.common.DialogPublicCodeGenerator;
+import com.dating.chat.data.CreateDialogResponseData;
+import com.dating.chat.data.DialogData;
 import com.dating.chat.data.NewDialogData;
-import com.dating.chat.data.ResponseData;
+import com.dating.chat.mapper.CreateDialogResponseMapper;
+import com.dating.chat.mapper.DialogDataMapper;
 import com.dating.chat.model.DialogModel;
 import com.dating.chat.repository.DialogRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class DialogService {
-    private DialogRepository repository;
+    private DialogRepository dialogRepository;
     private DialogPublicCodeGenerator codeGenerator;
 
-    public ResponseData<String> createDialog(NewDialogData data) {
-        boolean firstSecondFlag = repository.existsDialogModelByFirstLoginAndSecondLogin(data.getSender(), data.getRecipient());
-        boolean secondFirstFlag = repository.existsDialogModelByFirstLoginAndSecondLogin(data.getRecipient(), data.getSender());
+    public CreateDialogResponseData createDialog(NewDialogData data) {
+        boolean firstSecondFlag = dialogRepository.existsDialogModelByFirstLoginAndSecondLogin(data.getSender(), data.getRecipient());
+        boolean secondFirstFlag = dialogRepository.existsDialogModelByFirstLoginAndSecondLogin(data.getRecipient(), data.getSender());
         if (firstSecondFlag || secondFirstFlag) {
-            return new ResponseData<>(false, "This dialogue already exists!", null);
+            throw new CreateDialogConflictException("Такой диалог уже существует!");
         }
 
         DialogModel dialog = new DialogModel();
@@ -28,25 +34,37 @@ public class DialogService {
         dialog.setFirstLogin(data.getSender());
         dialog.setSecondLogin(data.getRecipient());
         dialog.setPublicCode(codeGenerator.generate(7));
-        dialog.setMessages(new HashSet<>());
+        dialog.setMessages(new ArrayList<>());
 
-        repository.save(dialog);
-
-        return new ResponseData<>(true, "Dialogue successfully created!", dialog.getPublicCode());
+        return CreateDialogResponseMapper.map(dialogRepository.save(dialog));
     }
 
-    public boolean existsDialog(String dialogCode) {
-        return repository.existsByPublicCode(dialogCode);
+    public DialogData getDialog(String dialogCode) {
+        return dialogRepository.findByPublicCodeAndActive(dialogCode, true)
+                .map(DialogDataMapper::map)
+                .orElseThrow(() -> new DialogNotFoundException("Диалог с таким кодом не найден!"));
     }
 
-    public ResponseData<DialogModel> getDialog(String dialogCode) {
-        return repository.findByPublicCode(dialogCode)
-                .map(model -> new ResponseData<>(true, null, model))
-                .orElse(new ResponseData<>(false, "Such dialogue does not exist or you do not have access to it!", null));
+    public List<DialogData> getDialogs() {
+        return dialogRepository.findAllByActive(true).stream()
+                .map(DialogDataMapper::map)
+                .toList();
     }
 
-    public ResponseData<?> updateDialog(DialogModel dialog) {
-        repository.save(dialog);
-        return new ResponseData<>(true, "Dialogue successfully changed!", null);
+    public DialogModel getDialogModel(String dialogCode) {
+        return dialogRepository.findByPublicCodeAndActive(dialogCode, true)
+                .orElseThrow(() -> new DialogNotFoundException("Диалог с таким кодом не найден!"));
+    }
+
+    public String blockDialog(String dialogCode) {
+        DialogModel dialog = getDialogModel(dialogCode);
+        dialog.setActive(false);
+        updateDialog(dialog);
+
+        return "Диалог успешно заблокирован!";
+    }
+
+    public void updateDialog(DialogModel dialog) {
+        dialogRepository.save(dialog);
     }
 }

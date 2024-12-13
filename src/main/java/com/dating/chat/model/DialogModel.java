@@ -3,6 +3,7 @@ package com.dating.chat.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -17,6 +18,9 @@ public class DialogModel {
     @Column(name = "public_code", nullable = false)
     private String publicCode;
 
+    @Column(name = "icon_path", nullable = false)
+    private String iconPath;
+
     @Column(name = "sender", nullable = false)
     private String firstLogin;
 
@@ -27,5 +31,10 @@ public class DialogModel {
     private boolean active;
 
     @OneToMany(mappedBy = "dialog")
-    private Set<MessageModel> messages;
+    private List<MessageModel> messages;
+
+    public void addMessage(MessageModel message) {
+        messages.add(message);
+        message.setDialog(this);
+    }
 }

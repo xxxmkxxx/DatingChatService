@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MessageRepository extends JpaRepository<MessageModel, Long> {
@@ -15,4 +16,6 @@ public interface MessageRepository extends JpaRepository<MessageModel, Long> {
     List<MessageModel> findLastRecordsWithAmount(@Param("amount") int amount, @Param("publicCode") String publicCode);
 
     int countAllByDialogPublicCode(String publicCode);
+
+    Optional<MessageModel> findByDialogPublicCode(String publicCode);
 }

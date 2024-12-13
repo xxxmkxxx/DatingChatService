@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Builder
 public class MessageData {
     private String sender;
-    private String dialogCode;
     private String text;
     private LocalDateTime dateTime;
 }

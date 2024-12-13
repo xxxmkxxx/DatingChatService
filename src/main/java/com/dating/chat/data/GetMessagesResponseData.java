@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class RestrictionsNumberMessagesData {
+public class GetMessagesResponseData {
     private int amount;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
