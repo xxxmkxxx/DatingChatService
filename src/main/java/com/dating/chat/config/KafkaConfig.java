@@ -15,7 +15,7 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConfig {
     private final String bootstrapServerConfig = "localhost:9092";
-    private final String groupIdConfig = "group_id";
+    private final String groupIdConfig = "dating";
 
     @Bean
     public ProducerFactory<String, String> producerFactory() {
