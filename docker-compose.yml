@@ -4,23 +4,73 @@ services:
     ports:
       - "8082:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dating
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/dating
       SPRING_DATASOURCE_USERNAME: dev
       SPRING_DATASOURCE_PASSWORD: 1237894560
       JWT_KEY: x3q9_62IxSgNDGczooBQJ-JYHRV0C839d8P-FEkKloA=
+      KAFKA_SERVER: kafka:9092
+      KAFKA_GROUP_ID: "dating"
     depends_on:
-      - db
+      - postgresql
+      - kafka
+    networks:
+      - network
 
-  db:
+  postgresql:
     image: postgres:15
     environment:
       POSTGRES_DB: dating
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: 1237894560
+    networks:
+      - network
     ports:
       - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - network
+    ports:
+      - "2181:2181"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "2181" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: 30000
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    networks:
+      - network
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "9092" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
 volumes:
   postgres_data:
+
+networks:
+  network:
+    driver: bridge
