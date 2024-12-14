@@ -10,13 +10,13 @@ import org.springframework.stereotype.Controller;
 @Controller
 @RequiredArgsConstructor
 public class StompMessageController {
-    public static final String CREATE_MESSAGE_STOMP_EVENT = "/message";
-    public static final String CREATE_MESSAGE_STOMP_EVENT_LISTENER = "/topic/messages";
+    public static final String CREATE_MESSAGE_STOMP_EVENT = "/{dialog}/message";
+    public static final String CREATE_MESSAGE_STOMP_EVENT_LISTENER = "/topic/{dialog}/messages";
     private final MessageService messageService;
 
     @MessageMapping(CREATE_MESSAGE_STOMP_EVENT)
     @SendTo(CREATE_MESSAGE_STOMP_EVENT_LISTENER)
-    public String sendMessage(MessageData messageData) {
+    public MessageData sendMessage(MessageData messageData) {
         return messageService.createStompMessage(messageData);
     }
 }

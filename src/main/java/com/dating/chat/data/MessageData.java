@@ -1,11 +1,12 @@
 package com.dating.chat.data;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class MessageData {
     private String dialogCode;
