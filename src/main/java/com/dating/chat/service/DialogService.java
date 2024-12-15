@@ -31,6 +31,7 @@ public class DialogService {
 
         DialogModel dialog = new DialogModel();
         dialog.setActive(true);
+        dialog.setIconPath(data.getIconPath());
         dialog.setFirstLogin(data.getSender());
         dialog.setSecondLogin(data.getRecipient());
         dialog.setPublicCode(codeGenerator.generate(7));

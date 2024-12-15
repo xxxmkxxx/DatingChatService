@@ -1,11 +1,13 @@
 package com.dating.chat.data;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class NewDialogData {
     private String sender;
     private String recipient;
+    private String iconPath;
 }
