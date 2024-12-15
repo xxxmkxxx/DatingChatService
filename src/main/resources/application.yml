@@ -33,6 +33,6 @@ jwt:
 logging:
   level:
     root: INFO
-    com.dating.chat: DEBUG
+    com.dating.chat: ERROR
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: DEBUG
