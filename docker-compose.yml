@@ -7,7 +7,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/dating
       SPRING_DATASOURCE_USERNAME: dev
       SPRING_DATASOURCE_PASSWORD: 1237894560
-      JWT_KEY: x3q9_62IxSgNDGczooBQJ-JYHRV0C839d8P-FEkKloA=
+      JWT_KEY: mDM_z_2tUErjwZ10libvNWnP9yDQ3q5M8A3ZXryyIus=
       KAFKA_SERVER: kafka:9092
       KAFKA_GROUP_ID: "dating"
     depends_on:
