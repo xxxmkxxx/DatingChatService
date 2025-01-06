@@ -6,8 +6,10 @@ import com.dating.chat.mapper.MessageDataMapper;
 import com.dating.chat.model.DialogModel;
 import com.dating.chat.model.MessageModel;
 import com.dating.chat.repository.MessageRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -29,11 +31,13 @@ public class MessageService {
                 .toList();
     }
 
+    @Transactional
     public String createMessage(MessageData messageData) {
         //TODO: add message validation
 
         DialogModel dialog = dialogService.getDialogModel(messageData.getDialogCode());
-        MessageModel message = updateMessage(messageData);
+        Hibernate.initialize(dialog.getMessages());
+        MessageModel message = createMessageModel(messageData);
 
         dialog.addMessage(messageRepository.save(message));
         dialogService.updateDialog(dialog);
@@ -41,6 +45,7 @@ public class MessageService {
         return "Сообщение успешно создано!";
     }
 
+    @Transactional
     public MessageData createStompMessage(MessageData messageData) {
         messageKafkaTemplate.send(CREATE_MESSAGE_TOPIC, messageData);
 
@@ -48,6 +53,7 @@ public class MessageService {
     }
 
     @KafkaListener(topics = CREATE_MESSAGE_TOPIC, groupId = "dating")
+    @Transactional
     public void handleCreateMessageEvent(MessageData messageData) {
         try {
             createMessage(messageData);
@@ -71,5 +77,13 @@ public class MessageService {
 
                     return messageModel;
                 });
+    }
+
+    private MessageModel createMessageModel(MessageData messageData) {
+        MessageModel messageModel = new MessageModel();
+        messageModel.setTextData(messageData.getText());
+        messageModel.setSender(messageData.getSender());
+
+        return messageModel;
     }
 }
