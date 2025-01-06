@@ -1,9 +1,12 @@
 services:
   app:
     build: .
+    profiles:
+      - dev
     ports:
       - "8082:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/dating
       SPRING_DATASOURCE_USERNAME: dev
       SPRING_DATASOURCE_PASSWORD: 1237894560
@@ -18,6 +21,8 @@ services:
 
   postgresql:
     image: postgres:15
+    profiles:
+      - dev
     environment:
       POSTGRES_DB: dating
       POSTGRES_USER: dev
@@ -31,6 +36,8 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    profiles:
+      - dev
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -48,6 +55,8 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:latest
+    profiles:
+      - dev
     container_name: kafka
     environment:
       KAFKA_BROKER_ID: 2
