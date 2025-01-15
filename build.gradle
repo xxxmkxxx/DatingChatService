@@ -63,8 +63,12 @@ test {
 openApiGenerate {
     generatorName.set("spring")
     inputSpec.set("$rootDir/src/main/resources/openapi.yml".replace("\\", "/"))
-    outputDir.set("$rootDir/src/main/java/com/dating/chat/generated".replace("\\", "/"))
+    outputDir.set("$rootDir/build/generated".replace("\\", "/"))
+    apiPackage.set("com.dating.chat.api")
+    modelPackage.set("com.dating.chat.api.dto")
     configOptions = [
             interfaceOnly: 'true'
     ]
 }
+
+compileJava.dependsOn(tasks.openApiGenerate)
