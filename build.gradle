@@ -55,8 +55,8 @@ test {
 
 openApiGenerate {
     generatorName.set("spring")
-    inputSpec.set("$rootDir/src/main/resources/openapi.yml")
-    outputDir.set("$rootDir/src/main/java/com/dating/chat/generated")
+    inputSpec.set("$rootDir/src/main/resources/openapi.yml".replace("\\", "/"))
+    outputDir.set("$rootDir/src/main/java/com/dating/chat/generated".replace("\\", "/"))
     configOptions = [
             interfaceOnly: 'true'
     ]
