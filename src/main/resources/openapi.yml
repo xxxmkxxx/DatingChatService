@@ -1,0 +1,630 @@
+openapi: 3.1.0
+info:
+  title: DatingChatService спецификация
+  description: Спецификация чат сервиса
+  version: 0.0.1
+servers:
+  - url: https://localhost:8082/
+    description: Сервер разработки
+security:
+  - BearerAuth: []
+paths:
+  /dialogs:
+    description: Маршрут для обработки данных диалогов
+    get:
+      description: Маршрут получения списка данных диалогов
+      tags:
+        - Диалоги
+      parameters:
+        - in: query
+          name: amount
+          schema:
+            type: integer
+          required: true
+          description: Количество диалогов для выборки
+          example: 20
+        - in: query
+          name: memberCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код пользователя, получающего список своих диалогов
+          example: aa59c11a-b512-4376-b571-81c567d456d3
+      responses:
+        200:
+          description: Код успешного получения списка данных о диалогах
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DialogData"
+        400:
+          description: Код некорректной обработки данных при получении даных о диалогах
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+    post:
+      tags:
+        - Диалоги
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewDialogData"
+      responses:
+        200:
+          description: Код успешного создания диалога
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleResponseData"
+        400:
+          description: Код некорректной обработки данных при создании диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+  /dialogs/{code}:
+    description: Маршрут для обработки диалогов по коду диалога
+    get:
+      description: Маршрут для получения диалога по коду диалога
+      tags:
+        - Диалоги
+      parameters:
+        - in: path
+          name: code
+          schema:
+            type: string
+          required: true
+          description: Уникальный код диалога
+          example: edf0ef6b-7c9e-4af9-9755-26c80475012e
+      responses:
+        200:
+          description: Код успешного получения диалога
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DialogData"
+        400:
+          description: Код некорректной обработки данных при получении диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+    delete:
+      description: Маршрут для удаления диалога
+      tags:
+        - Диалоги
+      parameters:
+        - in: path
+          name: code
+          schema:
+            type: string
+          required: true
+          description: Уникальный код диалога
+          example: edf0ef6b-7c9e-4af9-9755-26c80475012e
+      responses:
+        200:
+          description: Код успешного удаления диалога
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleResponseData"
+        400:
+          description: Код некорректной обработки данных при удалении диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+  /dialogs/{dialogCode}/members:
+    description: Маршрут для обработки данных участников конкретного диалога
+    get:
+      description: Маршрут получения всех участников диалога
+      tags:
+        - Участники диалога
+      parameters:
+        - in: path
+          name: dialogCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код диалога
+          example: dd4d259a-5919-4c75-8ee0-f22e8528f162
+      responses:
+        200:
+          description: Код успешного получения списка участников конкретного диолога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DialogMemberData"
+        400:
+          description: Код некорректной обработки данных при получении участников конкретного диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+    post:
+      description: Маршрут для добавления пользователя в диалог
+      tags:
+        - Участники диалога
+      parameters:
+        - in: path
+          name: dialogCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код диалога
+          example: dd4d259a-5919-4c75-8ee0-f22e8528f162
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewDialogMemberData"
+      responses:
+        200:
+          description: Код успешного добавления пользователя в диалог
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleResponseData"
+        400:
+          description: Код некорректной обработки данных при добавлении пользователя из диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+  /dialogs/{dialogCode}/members/{memberCode}:
+    description: Маршрут для обработки данных конкретного участника конкретного диалога
+    delete:
+      description: Маршрут удаления пользователя из диалога
+      tags:
+        - Участники диалога
+      parameters:
+        - in: path
+          name: dialogCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код диалога
+          example: edf0ef6b-7c9e-4af9-9755-26c80475012e
+        - in: path
+          name: memberCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код участника диалога
+          example: dd4d259a-5919-4c75-8ee0-f22e8528f162
+      responses:
+        200:
+          description: Код успешного удаления пользователя из диалога
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleResponseData"
+        400:
+          description: Код некорректной обработки данных при удалении пользователя из диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+  /dialog/{dialogCode}/messages/:
+    description: Маршрут для обработки сообщений в конкртном диалоге
+    get:
+      description: Маршрут получения заданного количества сообщений из диалога
+      tags:
+        - Сообщения диалога
+      parameters:
+        - in: query
+          name: amount
+          schema:
+            type: integer
+          required: true
+          description: Количество сообщений
+          example: 50
+        - in: path
+          name: dialogCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код диалога
+          example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        200:
+          description: Код успешного получения сообщений из конкретного диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageData"
+        400:
+          description: Код некорректной обработки данных при получении сообщений из диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+    post:
+      description: Маршрут создания сообщения в конкретном диалоге
+      tags:
+        - Сообщения диалога
+      parameters:
+        - in: path
+          name: dialogCode
+          schema:
+            type: string
+          required: false
+          description: Уникальный код диалога
+          example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageData"
+        required: true
+      responses:
+        200:
+          description: Код успешщного создания сообщения в диалоге
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleResponseData"
+        400:
+          description: Код некорректной обработки данных при создании сообщения в диалоге
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+  /dialog/{dialogCode}/messages/{messageCode}:
+    description: Маршрут для обработки данных конкретного сообщения в конкретном диалоге
+    get:
+      description: Маршрут получения сообщения из диалога
+      tags:
+        - Сообщения диалога
+      parameters:
+        - in: path
+          name: dialogCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код диалога
+          example: 550e8400-e29b-41d4-a716-446655440000
+        - in: path
+          name: messageCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код сообщения
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+      responses:
+        200:
+          description: Код успешного получения сообщения из диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageData"
+        400:
+          description: Код некорректной обработки данных при получении сообщения из диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+    delete:
+      description: Маршрут удаления сообщения из диалога
+      tags:
+        - Сообщения диалога
+      parameters:
+        - in: path
+          name: dialogCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код диалога
+          example: 550e8400-e29b-41d4-a716-446655440000
+        - in: path
+          name: messageCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код сообщения
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+      responses:
+        200:
+          description: Код успешного удаления сообщения из диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SimpleResponseData"
+        400:
+          description: Код некорректной обработки данных при удаления сообщения из диалога
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+    put:
+      description: Маршрут получения заданного количества сообщений из диалога
+      tags:
+        - Сообщения диалога
+      parameters:
+        - in: path
+          name: dialogCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код диалога
+          example: 550e8400-e29b-41d4-a716-446655440000
+        - in: path
+          name: messageCode
+          schema:
+            type: string
+          required: true
+          description: Уникальный код сообщения
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMessageData"
+      responses:
+        200:
+          description: Код успешщного изменения сообщения в диалоге
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleResponseData"
+        400:
+          description: Код некорректной обработки данных при изменения сообщения в диалоге
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ErrorData"
+        401:
+          description: Запрос без авторизации или с неверным токеном
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorData"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Используйте JWT токен для авторизации. Токен нужно передавать в заголовке Authorization с префиксом Bearer
+  schemas:
+    ErrorData:
+      type: object
+      description: Ошибка
+      properties:
+        code:
+          type: integer
+          description: Код ошибки
+          example: 400
+        description:
+          type: string
+          description: Описание ошибки
+          example: Сервер не смог обработать запрос, так как он был сформирован неправильно или содержит неверный синтаксис
+        moreDetails:
+          type: string
+          description: Описание ошибки
+          example: Некорректно передан параметр
+        createDateTime:
+          type: string
+          format: date-time
+          description: Время возникновения ошибки
+          example: 2025-01-11 14:35:00
+        id:
+          type: string
+          description: UUID ошибки
+          example: 776caf36-ca61-4f1c-8d22-a46c484e3c56
+    SimpleResponseData:
+      description: Сообщение от сервиса
+      type: object
+      properties:
+        message:
+          type: string
+          description: Текст сообщения от сервера
+          example: Какое то сообщение от сервера
+        createDateTime:
+          type: string
+          format: date-time
+          description: Время создания сообщения
+          example: 2025-01-11 14:35:00
+    DialogData:
+      description: Данные диалога
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Уникальный код диалога
+          example: bcdef8d4-bba1-45ed-9578-ab59845a6226
+        icon:
+          type: string
+          description: Иконка диалога
+          example: /icon/bcdef8d4/icon.jpg
+        name:
+          type: string
+          description: Название диалога
+          example: Диалог о рыбалке
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/DialogMemberData"
+          description: Список участников диалога
+          example: ["edf0ef6b-7c9e-4af9-9755-26c80475012e", "dd4d259a-5919-4c75-8ee0-f22e8528f162"]
+      required:
+        - code
+        - icon
+        - name
+        - members
+    NewDialogData:
+      description: Данные для создания нового диалога
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название диалога
+          example: Диалог о рыбалке
+        members:
+          type: array
+          items:
+            type: string
+          description: Список участников диалога
+          example: ["edf0ef6b-7c9e-4af9-9755-26c80475012e", "dd4d259a-5919-4c75-8ee0-f22e8528f162"]
+      required:
+        - name
+        - members
+    MessageData:
+      type: object
+      description: Данные сообщения
+      properties:
+        uuid:
+          type: string
+          description: UUID сообщения
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        senderCode:
+          type: string
+          description: Уникальный код отправителя сообщения
+          example: b6b5b972-07a2-4f21-b402-70a99af7dda7
+        text:
+          type: string
+          description: Текст сообщения
+          example: Моё первое сообщение
+        createDateTime:
+          type: string
+          format: date-time
+          description: Время создания сообщения
+          example: 2025-01-11 14:35:00
+      required:
+        - senderCode
+        - text
+        - createDateTime
+    UpdateMessageData:
+      description: Данный для обновления сообщения в диалоге
+      type: object
+      properties:
+        text:
+          type: string
+          description: Текст сообщения
+    NewDialogMemberData:
+      description: Данные для добавления пользователя в диалог
+      type: object
+      properties:
+        userCode:
+          type: string
+          description: Уникальный код пользователя
+          example: edf0ef6b-7c9e-4af9-9755-26c80475012e
+    DialogMemberData:
+      description: Данные участника диалога
+      type: object
+      properties:
+        icon:
+          type: string
+          description: Иконка участника
+          example: /icon/bcdef8d4/icon.jpg
+        name:
+          type: string
+          description: Имя участника
+          example: Вася
+        type: string
+        description: Фамилия участника
+        example: Васечкин
