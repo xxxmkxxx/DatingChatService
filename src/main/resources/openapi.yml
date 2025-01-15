@@ -8,13 +8,17 @@ servers:
     description: Сервер разработки
 security:
   - BearerAuth: []
+tags:
+  - name: Dialogs
+  - name: Dialog members
+  - name: Dialog messages
 paths:
   /dialogs:
     description: Маршрут для обработки данных диалогов
     get:
       description: Маршрут получения списка данных диалогов
       tags:
-        - Диалоги
+        - Dialogs
       parameters:
         - in: query
           name: amount
@@ -55,7 +59,7 @@ paths:
                 $ref: "#/components/schemas/ErrorData"
     post:
       tags:
-        - Диалоги
+        - Dialogs
       requestBody:
         content:
           application/json:
@@ -87,7 +91,7 @@ paths:
     get:
       description: Маршрут для получения диалога по коду диалога
       tags:
-        - Диалоги
+        - Dialogs
       parameters:
         - in: path
           name: code
@@ -120,7 +124,7 @@ paths:
     delete:
       description: Маршрут для удаления диалога
       tags:
-        - Диалоги
+        - Dialogs
       parameters:
         - in: path
           name: code
@@ -155,7 +159,7 @@ paths:
     get:
       description: Маршрут получения всех участников диалога
       tags:
-        - Участники диалога
+        - Dialog members
       parameters:
         - in: path
           name: dialogCode
@@ -190,7 +194,7 @@ paths:
     post:
       description: Маршрут для добавления пользователя в диалог
       tags:
-        - Участники диалога
+        - Dialog members
       parameters:
         - in: path
           name: dialogCode
@@ -231,7 +235,7 @@ paths:
     delete:
       description: Маршрут удаления пользователя из диалога
       tags:
-        - Участники диалога
+        - Dialog members
       parameters:
         - in: path
           name: dialogCode
@@ -273,7 +277,7 @@ paths:
     get:
       description: Маршрут получения заданного количества сообщений из диалога
       tags:
-        - Сообщения диалога
+        - Dialog messages
       parameters:
         - in: query
           name: amount
@@ -315,7 +319,7 @@ paths:
     post:
       description: Маршрут создания сообщения в конкретном диалоге
       tags:
-        - Сообщения диалога
+        - Dialog messages
       parameters:
         - in: path
           name: dialogCode
@@ -356,7 +360,7 @@ paths:
     get:
       description: Маршрут получения сообщения из диалога
       tags:
-        - Сообщения диалога
+        - Dialog messages
       parameters:
         - in: path
           name: dialogCode
@@ -398,7 +402,7 @@ paths:
     delete:
       description: Маршрут удаления сообщения из диалога
       tags:
-        - Сообщения диалога
+        - Dialog messages
       parameters:
         - in: path
           name: dialogCode
@@ -440,7 +444,7 @@ paths:
     put:
       description: Маршрут получения заданного количества сообщений из диалога
       tags:
-        - Сообщения диалога
+        - Dialog messages
       parameters:
         - in: path
           name: dialogCode
