@@ -625,6 +625,7 @@ components:
           type: string
           description: Имя участника
           example: Вася
-        type: string
-        description: Фамилия участника
-        example: Васечкин
+        surname:
+          type: string
+          description: Фамилия участника
+          example: Васечкин
