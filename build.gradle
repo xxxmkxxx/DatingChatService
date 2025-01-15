@@ -76,7 +76,7 @@ compileJava.dependsOn(tasks.openApiGenerate)
 sourceSets {
     getByName("main") {
         java {
-            srcDir("$rootDir/build/generated/src/main".replace("\\", "/"))
+            srcDir("$rootDir/build/generated/src/main/java".replace("\\", "/"))
         }
     }
 }
