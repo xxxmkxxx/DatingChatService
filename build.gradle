@@ -15,6 +15,9 @@ java {
 }
 
 ext {
+    openApiSpecificationPath = "$rootDir/src/main/resources/openApi/openapi.yml".replace("\\", "/")
+    openApiGeneratedDirPath = "$rootDir/build/generated".replace("\\", "/")
+    openApiSrcDirPath = "$rootDir/build/generated/src/main/java".replace("\\", "/")
     swaggerVersion = "2.2.0"
     javaxAnnotationVersion = "1.3.2"
     javaxValidationVersion = "2.0.1.Final"
@@ -65,8 +68,8 @@ test {
 
 openApiGenerate {
     generatorName.set("spring")
-    inputSpec.set("$rootDir/src/main/resources/openapi.yml".replace("\\", "/"))
-    outputDir.set("$rootDir/build/generated".replace("\\", "/"))
+    inputSpec.set("${openApiSpecificationPath}")
+    outputDir.set("${openApiGeneratedDirPath}")
     apiPackage.set("com.dating.chat.api")
     modelPackage.set("com.dating.chat.api.dto")
     configOptions = [
@@ -81,7 +84,7 @@ compileJava.dependsOn(tasks.openApiGenerate)
 sourceSets {
     getByName("main") {
         java {
-            srcDir("$rootDir/build/generated/src/main/java".replace("\\", "/"))
+            srcDir("${openApiSrcDirPath}")
         }
     }
 }
