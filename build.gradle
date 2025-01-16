@@ -8,6 +8,10 @@ plugins {
 group = 'com.dating.chat'
 version = '0.0.1-SNAPSHOT'
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -17,7 +21,9 @@ java {
 ext {
     openApiSpecificationPath = "$rootDir/src/main/resources/openApi/openapi.yml".replace("\\", "/")
     openApiGeneratedDirPath = "$rootDir/build/generated".replace("\\", "/")
+    openApiTemplateDirPath = "$rootDir/src/main/resources/openApi/templates".replace("\\", "/")
     openApiSrcDirPath = "$rootDir/build/generated/src/main/java".replace("\\", "/")
+    openApiCustomMustacheConfigPath = "$rootDir/src/main/resources/openApi/customMustacheConfig.js".replace("\\", "/")
     swaggerVersion = "2.2.0"
     javaxAnnotationVersion = "1.3.2"
     javaxValidationVersion = "2.0.1.Final"
@@ -70,15 +76,39 @@ openApiGenerate {
     generatorName.set("spring")
     inputSpec.set("${openApiSpecificationPath}")
     outputDir.set("${openApiGeneratedDirPath}")
+    templateDir.set("${openApiTemplateDirPath}")
     apiPackage.set("com.dating.chat.api")
     modelPackage.set("com.dating.chat.api.dto")
     configOptions = [
             interfaceOnly: "true",
             useTags: "true",
-            skipDefaultInterface: "true"
+            skipDefaultInterface: "true",
+            mustacheConfig: "${openApiCustomMustacheConfigPath}"
     ]
 }
 
+tasks.register('postProcessOpenApiGeneratedCode') {
+    doLast {
+        def generatedDir = file("${openApiGeneratedDirPath}")
+        generatedDir.eachFileRecurse { file ->
+            if (file.name.endsWith('.java')) {
+                def content = file.getText('UTF-8')
+
+                content = content.replaceAll(/<const>(.*?)<\/const>/) { match, word ->
+                    def snakeCase = word
+                            .replaceAll(/([a-z])([A-Z])/, '$1_$2')
+                            .replaceAll(/[\s\-]/, '_')
+                            .toUpperCase()
+                    snakeCase
+                }
+
+                file.setText(content, 'UTF-8')
+            }
+        }
+    }
+}
+
+tasks.openApiGenerate.finalizedBy(postProcessOpenApiGeneratedCode)
 compileJava.dependsOn(tasks.openApiGenerate)
 
 sourceSets {
