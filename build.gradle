@@ -70,8 +70,9 @@ openApiGenerate {
     apiPackage.set("com.dating.chat.api")
     modelPackage.set("com.dating.chat.api.dto")
     configOptions = [
-            interfaceOnly: 'true',
-            useTags: 'true'
+            interfaceOnly: "true",
+            useTags: "true",
+            skipDefaultInterface: "true"
     ]
 }
 
